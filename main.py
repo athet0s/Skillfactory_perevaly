@@ -1,4 +1,7 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, status
+from fastapi.exceptions import RequestValidationError
+from fastapi.responses import JSONResponse
+from fastapi.encoders import jsonable_encoder
 
 from schemas import Pereval
 from classes import PerevalManager
@@ -6,10 +9,24 @@ from classes import PerevalManager
 app = FastAPI()
 
 
+@app.exception_handler(RequestValidationError)
+def validation_exception_handler(request, exc):
+    return JSONResponse(
+        status_code=status.HTTP_400_BAD_REQUEST,
+        content=jsonable_encoder({"status": 400, "message": "Поля заполненны неверно", "id": None})
+    )
+
+
 @app.post("/submit")
 def submitData(data: Pereval):
-    pereval_manager = PerevalManager(data)
-    with pereval_manager as db:
-        p_id = db.insert_data()
-    result = {"status": 200, "message": "Отправлено успешно", "id": p_id}
-    return result
+    try:
+        pereval_manager = PerevalManager(data)
+        with pereval_manager as db:
+            added_pereval_id = db.insert_data()
+    except Exception as e:
+        return JSONResponse(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            content=jsonable_encoder({"status": 500, "message": "Ошибка подключения к базе данных", "id": None})
+        )
+    return {"status": 200, "message": "Отправлено успешно", "id": added_pereval_id}
+
