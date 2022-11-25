@@ -1,6 +1,7 @@
 import os
 import psycopg2
 from dotenv import load_dotenv
+from datetime import datetime
 
 load_dotenv()
 
@@ -30,6 +31,7 @@ class DBManager:
 class PerevalManager(DBManager):
     def __init__(self, data):
         self._data = data
+        self._pereval_status = "new"
 
     def insert_data(self):
         user_id = self.insert_or_update_user()
@@ -46,13 +48,13 @@ class PerevalManager(DBManager):
                                   (fam, name, otc, phone) = (EXCLUDED.fam, EXCLUDED.name, EXCLUDED.otc, EXCLUDED.phone)
                                   RETURNING id;
                               ''',
-                             (user.fam, user.name, user.otc, user.phone, user.mail))
+                             (user.fam, user.name, user.otc, user.phone, user.email))
         pk = self._cursor.fetchone()[0]
         return pk
 
     def insert_coords(self):
         coords = self._data.coords
-        self._cursor.execute("INSERT INTO coords (latitude, longitude, height) VALUES (%s, %s, %s,) RETURNING id",
+        self._cursor.execute("INSERT INTO coords (latitude, longitude, height) VALUES (%s, %s, %s) RETURNING id",
                              (float(coords.latitude), float(coords.longitude), int(coords.height)))
         pk = self._cursor.fetchone()[0]
         return pk
@@ -60,13 +62,16 @@ class PerevalManager(DBManager):
     def insert_pereval(self, user_id, coord_id):
         data = self._data
         level = data.level
+        dt = datetime.now()
         self._cursor.execute('''INSERT INTO pereval_added (beauty_title, title, other_titles, connect, add_time,
-                                    level_winter, level_summer, level_autumn, level_spring, user_id, coord_id) 
-                                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) 
+                                    level_winter, level_summer, level_autumn, level_spring, user_id, coord_id, status,
+                                    date_added) 
+                                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) 
                                     RETURNING id;
                              ''',
                              (data.beauty_title, data.title, data.other_titles, data.connect, data.add_time,
-                              level.winter, level.summer, level.autumn, level.spring, user_id, coord_id))
+                              level.winter, level.summer, level.autumn, level.spring, user_id, coord_id,
+                              self._pereval_status, dt))
 
         pk = self._cursor.fetchone()[0]
         return pk
