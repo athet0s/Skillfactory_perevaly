@@ -1,17 +1,20 @@
+import os
 import psycopg2
+from dotenv import load_dotenv
+
+load_dotenv()
 
 
 class DBManager:
-    def __init__(self, name, host, login, password, port):
-        self._name = name
-        self._host = host
-        self._login = login
-        self._password = password
-        self._port = port
+    DB_NAME = os.getenv("FSTR_DB_NAME")
+    DB_HOST = os.getenv("FSTR_DB_HOST")
+    DB_LOGIN = os.getenv("FSTR_DB_LOGIN")
+    DB_PASS = os.getenv("FSTR_DB_PASS")
+    DB_PORT = os.getenv("FSTR_DB_PORT")
 
     def __enter__(self):
-        self._conn = psycopg2.connect(dbname=self._name, user=self._login,
-                                      password=self._password, host=self._host, port=self._port)
+        self._conn = psycopg2.connect(dbname=DBManager.DB_NAME, user=DBManager.DB_LOGIN,
+                                      password=DBManager.DB_PASS, host=DBManager.DB_HOST, port=DBManager.DB_PORT)
 
         self._cursor = self._conn.cursor()
         return self
@@ -23,12 +26,22 @@ class DBManager:
         self._cursor.close()
         self._conn.close()
 
-    def fetchall(self):
-        return self._cursor.fetchall()
 
-    def fetchone(self):
-        return self._cursor.fetchone()
+class PerevalManager(DBManager):
+    def insert_data(self, data):
+        self.insert_or_update_user(data.user)
+        self.insert_coords(data.coords)
+        self.insert_level(data.level)
+        self.insert_pereval(data.beauty_title, data.title, data.other_titles, data.connect, data.add_time)
 
-    def query(self, sql):
-        self._cursor.execute(sql)
-        return self.fetchall()
+    def insert_or_update_user(self, user):
+        pass
+
+    def insert_coords(self, coords):
+        pass
+
+    def insert_level(self, level):
+        pass
+
+    def insert_pereval(self, beauty_title, title, other_titles, connect, add_time):
+        pass
