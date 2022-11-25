@@ -1,13 +1,13 @@
 from typing import List
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class User(BaseModel):
-    email: str
-    phone: str
-    name: str
-    fam: str
-    otc: str
+    email: str = Field(min_length=1)
+    phone: str = Field(min_length=1)
+    name: str = Field(min_length=1)
+    fam: str = Field(min_length=1)
+    otc: str = Field(min_length=1)
 
 
 class Image(BaseModel):
@@ -23,13 +23,13 @@ class Level(BaseModel):
 
 
 class Coords(BaseModel):
-    height: str
-    latitude: str
-    longitude: str
+    height: str = Field(min_length=1)
+    latitude: str = Field(min_length=1)
+    longitude: str = Field(min_length=1)
 
 
 class Pereval(BaseModel):
-    title: str
+    title: str = Field(min_length=1)
     beauty_title: str
     other_titles: str
     add_time: str
