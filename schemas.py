@@ -12,7 +12,7 @@ class User(BaseModel):
 
 class Image(BaseModel):
     title: str
-    base64: str
+    data: str
 
 
 class Level(BaseModel):
@@ -23,9 +23,9 @@ class Level(BaseModel):
 
 
 class Coords(BaseModel):
-    height: int
-    latitude: float
-    longitude: float
+    height: str
+    latitude: str
+    longitude: str
 
 
 class Pereval(BaseModel):
@@ -36,6 +36,8 @@ class Pereval(BaseModel):
     connect: str
     user: User
     images: List[Image]
+    coords: Coords
+    level: Level
 
 
 
