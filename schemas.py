@@ -11,8 +11,8 @@ class User(BaseModel):
 
 
 class Image(BaseModel):
-    title: str
-    data: str
+    title: str = Field(min_length=1)
+    data: str = Field(min_length=1)
 
 
 class Level(BaseModel):
