@@ -20,9 +20,9 @@ def validation_exception_handler(request, exc):
 @app.post("/submit")
 def submitData(data: Pereval):
     try:
-        pereval_manager = PerevalManager(data)
+        pereval_manager = PerevalManager()
         with pereval_manager as db:
-            added_pereval_id = db.insert_data()
+            added_pereval_id = db.insert_data(data)
     except Exception as e:
         return JSONResponse(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -30,3 +30,13 @@ def submitData(data: Pereval):
         )
     return {"status": 200, "message": "Отправлено успешно", "id": added_pereval_id}
 
+
+@app.get("/submitData/{pereval_id}")
+def get_pereval(pereval_id):
+    pereval_manager = PerevalManager()
+    with pereval_manager as db:
+        pereval_data = db.get_pereval_data(pereval_id)
+    return JSONResponse(
+        status_code=status.HTTP_200_OK,
+        content=jsonable_encoder(pereval_data)
+    )

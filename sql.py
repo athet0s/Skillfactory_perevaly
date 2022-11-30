@@ -27,3 +27,5 @@ SQL_INSERT_PEREVAL_IMAGES = '''INSERT INTO pereval_images (title, img, date_adde
 SQL_INSERT_PEREVAL_ADDED_PEREVAL_IMAGES = '''INSERT INTO pereval_added_pereval_images (pereval_id, image_id)
                                                 VALUES (%(pereval_id)s, %(image_id)s)
                                           '''
+
+SQL_SELECT_PEREVAL_BY_ID = 'SELECT * FROM pereval_added WHERE id = %s'

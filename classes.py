@@ -1,5 +1,6 @@
 import os
 import psycopg2
+from psycopg2 import extras
 from dotenv import load_dotenv
 from datetime import datetime
 from sql import *
@@ -18,7 +19,7 @@ class DBManager:
         self._conn = psycopg2.connect(dbname=DBManager.DB_NAME, user=DBManager.DB_LOGIN,
                                       password=DBManager.DB_PASS, host=DBManager.DB_HOST, port=DBManager.DB_PORT)
 
-        self._cursor = self._conn.cursor()
+        self._cursor = self._conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
@@ -30,20 +31,17 @@ class DBManager:
 
 
 class PerevalManager(DBManager):
-    def __init__(self, data):
-        self._data = data
-        self._pereval_status = "new"
 
-    def insert_data(self):
-        user_id = self._insert_or_update_user()
-        coord_id = self._insert_coords()
-        pereval_id = self._insert_pereval(user_id, coord_id)
-        self._insert_images(pereval_id)
+    def insert_data(self, data):
+        user_id = self._insert_or_update_user(data)
+        coord_id = self._insert_coords(data)
+        pereval_id = self._insert_pereval(data, user_id, coord_id)
+        self._insert_images(data, pereval_id)
         self._conn.commit()
         return pereval_id
 
-    def _insert_or_update_user(self):
-        user = self._data.user
+    def _insert_or_update_user(self, data):
+        user = data.user
         self._cursor.execute(SQL_INSERT_OR_UPDATE_USERS,
                              ({'fam': user.fam,
                                'name': user.name,
@@ -53,8 +51,8 @@ class PerevalManager(DBManager):
         pk = self._cursor.fetchone()[0]
         return pk
 
-    def _insert_coords(self):
-        coords = self._data.coords
+    def _insert_coords(self, data):
+        coords = data.coords
         self._cursor.execute(SQL_INSERT_COORDS,
                              ({'latitude': float(coords.latitude),
                                'longitude': float(coords.longitude),
@@ -62,8 +60,7 @@ class PerevalManager(DBManager):
         pk = self._cursor.fetchone()[0]
         return pk
 
-    def _insert_pereval(self, user_id, coord_id):
-        data = self._data
+    def _insert_pereval(self, data, user_id, coord_id):
         level = data.level
         self._cursor.execute(SQL_INSERT_PEREVAL,
                              ({'beauty_title': data.beauty_title,
@@ -74,17 +71,17 @@ class PerevalManager(DBManager):
                                'level_winter': level.winter,
                                'level_summer': level.summer,
                                'level_autumn': level.autumn,
-                              'level_spring': level.spring,
+                               'level_spring': level.spring,
                                'user_id': user_id,
                                'coord_id': coord_id,
-                               'status': self._pereval_status,
+                               'status': 'new',
                                'date_added': datetime.now()}))
 
         pk = self._cursor.fetchone()[0]
         return pk
 
-    def _insert_images(self, pereval_id):
-        for i in self._data.images:
+    def _insert_images(self, data, pereval_id):
+        for i in data.images:
             self._cursor.execute(SQL_INSERT_PEREVAL_IMAGES,
                                  ({'title': i.title,
                                    'img': i.data,
@@ -93,3 +90,7 @@ class PerevalManager(DBManager):
             self._cursor.execute(SQL_INSERT_PEREVAL_ADDED_PEREVAL_IMAGES,
                                  ({'pereval_id': pereval_id,
                                    'image_id': image_id}))
+
+    def get_pereval_data(self, pereval_id):
+        self._cursor.execute(SQL_SELECT_PEREVAL_BY_ID, (pereval_id,))
+        return self._cursor.fetchone()
