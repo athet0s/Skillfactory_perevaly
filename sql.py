@@ -28,4 +28,12 @@ SQL_INSERT_PEREVAL_ADDED_PEREVAL_IMAGES = '''INSERT INTO pereval_added_pereval_i
                                                 VALUES (%(pereval_id)s, %(image_id)s)
                                           '''
 
-SQL_SELECT_PEREVAL_BY_ID = 'SELECT * FROM pereval_added WHERE id = %s'
+SQL_SELECT_PEREVAL_BY_ID = '''SELECT pereval_added.date_added, pereval_added.status, pereval_added.beauty_title,
+                                    pereval_added.title, pereval_added.other_titles, pereval_added.connect, 
+                                    pereval_added.add_time, pereval_added.level_winter, pereval_added.level_summer, 
+                                    pereval_added.level_autumn, pereval_added.level_spring, coords.latitude, 
+                                    coords.longitude, coords.height
+                                FROM pereval_added 
+                                JOIN coords ON pereval_added.coord_id = coords.id                            
+                                WHERE pereval_added.id = %s
+                            '''
