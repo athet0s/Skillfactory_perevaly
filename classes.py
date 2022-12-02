@@ -96,7 +96,8 @@ class PerevalManager(DBManager):
         query_result = self._cursor.fetchone()
         if not query_result:
             return False
-        pereval = {'beauty_title': query_result['beauty_title'],
+        pereval = {'id': pereval_id,
+                   'beauty_title': query_result['beauty_title'],
                    'title': query_result['title'],
                    'other_titles': query_result['other_titles'],
                    'date_added': query_result['date_added'],
