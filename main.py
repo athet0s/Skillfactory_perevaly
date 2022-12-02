@@ -36,6 +36,11 @@ def get_pereval(pereval_id):
     pereval_manager = PerevalManager()
     with pereval_manager as db:
         pereval_data = db.get_pereval_data(pereval_id)
+    if not pereval_data:
+        return JSONResponse(
+            status_code=status.HTTP_404_NOT_FOUND,
+            content=jsonable_encoder({"status": 404, "message": "Перевал с данным id не найден", "id": pereval_id})
+        )
     return JSONResponse(
         status_code=status.HTTP_200_OK,
         content=jsonable_encoder(pereval_data)
