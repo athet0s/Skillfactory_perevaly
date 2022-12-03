@@ -93,31 +93,17 @@ class PerevalManager(DBManager):
 
     def get_pereval_data_by_id(self, pereval_id):
         self._cursor.execute(SQL_SELECT_PEREVAL_BY_ID, (pereval_id,))
-        query_result = self._cursor.fetchone()
-        if not query_result:
+        pereval = self._cursor.fetchone()
+        if not pereval:
             return False
-        return {'id': pereval_id,
-                'beauty_title': query_result['beauty_title'],
-                'title': query_result['title'],
-                'other_titles': query_result['other_titles'],
-                'date_added': query_result['date_added'],
-                'add_time': query_result['add_time'],
-                'status': query_result['status'],
-                'connect': query_result['connect'],
-                'latitude': query_result['latitude'],
-                'longitude': query_result['longitude'],
-                'height': query_result['height'],
-                'level_winter': query_result['level_winter'],
-                'level_summer': query_result['level_summer'],
-                'level_autumn': query_result['level_autumn'],
-                'level_spring': query_result['level_spring']
-                }
+        return dict(pereval)
 
     def get_perevals_by_user_email(self, user_email):
         self._cursor.execute(SQL_SELECT_PEREVALS_BY_USER_EMAIL, (user_email,))
-        query_result = self._cursor.fetchall()
-        perevals = [pereval for pereval in query_result]
+        perevals = self._cursor.fetchall()
+        if len(perevals) == 0:
+            return False
+        return [dict(pereval) for pereval in perevals]
 
-        return perevals
 
 

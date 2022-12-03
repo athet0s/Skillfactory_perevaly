@@ -52,9 +52,13 @@ def get_user_perevals(user_email: str):
     pereval_manager = PerevalManager()
     with pereval_manager as db:
         user_perevals = db.get_perevals_by_user_email(user_email)
+    if not user_perevals:
+        return JSONResponse(
+            status_code=status.HTTP_404_NOT_FOUND,
+            content=jsonable_encoder({"status": 404, "message": "Не найденно перевалов от пользовтеля", "id": None})
+        )
     return JSONResponse(
         status_code=status.HTTP_200_OK,
         content=jsonable_encoder(user_perevals)
     )
-
 
