@@ -116,6 +116,8 @@ class PerevalManager(DBManager):
     def get_perevals_by_user_email(self, user_email):
         self._cursor.execute(SQL_SELECT_PEREVALS_BY_USER_EMAIL, (user_email,))
         query_result = self._cursor.fetchall()
-        return query_result
+        perevals = [pereval for pereval in query_result]
+
+        return perevals
 
 
