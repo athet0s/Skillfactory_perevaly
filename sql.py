@@ -38,7 +38,7 @@ SQL_SELECT_PEREVAL_BY_ID = '''SELECT pereval_added.date_added, pereval_added.sta
                                 WHERE pereval_added.id = %s
                             '''
 
-SQL_SELECT_PEREVALS_BY_USER_EMAIL = ''' SELECT pereval_added.id, pereval_added.beauty_title, pereval_added.beauty_title, 
+SQL_SELECT_PEREVALS_BY_USER_EMAIL = ''' SELECT pereval_added.id, pereval_added.title, pereval_added.beauty_title, 
                                                 pereval_added.status, pereval_added.date_added, coords.latitude, 
                                                 coords.longitude, coords.height
                                             FROM pereval_added 
