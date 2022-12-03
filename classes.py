@@ -105,8 +105,32 @@ class PerevalManager(DBManager):
             return False
         return [dict(pereval) for pereval in perevals]
 
-
-    def update_pereval(self, pereval_id):
-        self._cursor.execute(SQL_UPDATE_PEREVAL, (pereval_id,))
+    def update_data(self, pereval_id, data):
+        self._update_pereval(pereval_id, data)
+        self._update_coords(pereval_id, data)
+        self._conn.commit()
         return True
 
+    def _update_pereval(self, pereval_id, data):
+        if not self.is_user_pereval_exists(pereval_id, data.user.email):
+            return False
+        level = data.level
+        self._cursor.execute(SQL_UPDATE_PEREVAL, ({'id': pereval_id,
+                                                   'beauty_title': data.beauty_title,
+                                                   'title': data.title,
+                                                   'other_titles': data.other_titles,
+                                                   'connect': data.connect,
+                                                   'level_winter': level.winter,
+                                                   'level_summer': level.summer,
+                                                   'level_autumn': level.autumn,
+                                                   'level_spring': level.spring}))
+
+    def _update_coords(self, pereval_id, data):
+        coords = data.coords
+        self._cursor.execute(SQL_UPDATE_COORDS, ({'latitude': float(coords.latitude),
+                                                  'longitude': float(coords.longitude),
+                                                  'height': int(coords.height),
+                                                  'pereval_id': pereval_id}))
+
+    def is_user_pereval_exists(self, pereval_id, email):
+        pass

@@ -48,5 +48,16 @@ SQL_SELECT_PEREVALS_BY_USER_EMAIL = ''' SELECT pereval_added.id, pereval_added.t
                                     '''
 
 
-SQL_UPDATE_PEREVAL = '''
+SQL_UPDATE_PEREVAL = ''' UPDATE pereval_added
+                            SET beauty_title = %(beauty_title)s, title = %(title)s, other_titles  = %(other_titles)s, 
+                                connect = %(connect)s, level_winter = %(level_winter)s, level_summer = %(level_summer)s, 
+                                level_autumn = %(level_autumn)s, level_spring = %(level_spring)s
+                            WHERE id = %(id)s
+                     '''
+
+
+SQL_UPDATE_COORDS = ''' UPDATE coords
+                            SET latitude = %(latitude)s, longitude = %(longitude)s, height = %(height)s
+                            FROM pereval_added as p
+                            WHERE p.id = %(pereval_id)s AND coords.id = p.coord_id
                      '''

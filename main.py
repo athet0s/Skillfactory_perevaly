@@ -64,10 +64,10 @@ def get_user_perevals(user_email: str):
 
 
 @app.patch("/submitData/{pereval_id}")
-def change_pereval(pereval_id: int):
+def change_pereval(pereval_id: int, data: Pereval):
     pereval_manager = PerevalManager()
     with pereval_manager as db:
-        is_successful = db.update_pereval(pereval_id)
+        is_successful = db.update_data(pereval_id, data)
     return JSONResponse(
         status_code=status.HTTP_200_OK,
         content=jsonable_encoder({'state': is_successful, 'message': 'placeholder'})
