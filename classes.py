@@ -106,4 +106,7 @@ class PerevalManager(DBManager):
         return [dict(pereval) for pereval in perevals]
 
 
+    def update_pereval(self, pereval_id):
+        self._cursor.execute(SQL_UPDATE_PEREVAL, (pereval_id,))
+        return True
 
