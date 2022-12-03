@@ -32,10 +32,10 @@ def submitData(data: Pereval):
 
 
 @app.get("/submitData/{pereval_id}")
-def get_pereval(pereval_id):
+def get_pereval(pereval_id: int):
     pereval_manager = PerevalManager()
     with pereval_manager as db:
-        pereval_data = db.get_pereval_data(pereval_id)
+        pereval_data = db.get_pereval_data_by_id(pereval_id)
     if not pereval_data:
         return JSONResponse(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -45,3 +45,15 @@ def get_pereval(pereval_id):
         status_code=status.HTTP_200_OK,
         content=jsonable_encoder(pereval_data)
     )
+
+
+@app.get("/submitData")
+def get_user_perevals(user_email: str):
+    pereval_manager = PerevalManager()
+    with pereval_manager as db:
+        user_perevals = db.get_perevals_by_user_email(user_email)
+    return JSONResponse(
+        status_code=status.HTTP_200_OK,
+        content=jsonable_encoder(user_perevals)
+    )
+

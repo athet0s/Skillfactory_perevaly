@@ -37,3 +37,10 @@ SQL_SELECT_PEREVAL_BY_ID = '''SELECT pereval_added.date_added, pereval_added.sta
                                 JOIN coords ON pereval_added.coord_id = coords.id                            
                                 WHERE pereval_added.id = %s
                             '''
+
+SQL_SELECT_PEREVALS_BY_USER_EMAIL = ''' SELECT * FROM pereval_added 
+
+
+                                    '''
+
+
