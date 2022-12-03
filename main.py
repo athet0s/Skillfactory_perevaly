@@ -57,3 +57,4 @@ def get_user_perevals(user_email: str):
         content=jsonable_encoder(user_perevals)
     )
 
+

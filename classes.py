@@ -118,3 +118,4 @@ class PerevalManager(DBManager):
         query_result = self._cursor.fetchall()
         return query_result
 
+
