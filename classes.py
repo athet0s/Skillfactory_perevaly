@@ -106,14 +106,13 @@ class PerevalManager(DBManager):
         return [dict(pereval) for pereval in perevals]
 
     def update_data(self, pereval_id, data):
+        self.is_pereval_poster_email_matches_user_email(9, '')
         self._update_pereval(pereval_id, data)
         self._update_coords(pereval_id, data)
         self._conn.commit()
         return True
 
     def _update_pereval(self, pereval_id, data):
-        if not self.is_user_pereval_exists(pereval_id, data.user.email):
-            return False
         level = data.level
         self._cursor.execute(SQL_UPDATE_PEREVAL, ({'id': pereval_id,
                                                    'beauty_title': data.beauty_title,
@@ -132,5 +131,15 @@ class PerevalManager(DBManager):
                                                   'height': int(coords.height),
                                                   'pereval_id': pereval_id}))
 
-    def is_user_pereval_exists(self, pereval_id, email):
-        pass
+    def is_pereval_exists(self, pereval_id):
+        self._cursor.execute(SQL_IS_PERVAL_ID_EXISTS, (pereval_id,))
+        return self._cursor.fetchone()[0]
+
+    def is_email_exists(self, email):
+        self._cursor.execute(SQL_IS_USER_EMAIL_EXISTS, (email,))
+        return self._cursor.fetchone()[0]
+
+    def is_pereval_poster_email_matches_user_email(self, pereval_id, email):
+        self._cursor.execute(SQL_SELECT_USER_EMAIL_BY_PEREVAL_ID, (pereval_id,))
+        return self._cursor.fetchone()[0] == email
+

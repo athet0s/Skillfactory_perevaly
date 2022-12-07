@@ -61,3 +61,13 @@ SQL_UPDATE_COORDS = ''' UPDATE coords
                             FROM pereval_added as p
                             WHERE p.id = %(pereval_id)s AND coords.id = p.coord_id
                      '''
+
+SQL_IS_PERVAL_ID_EXISTS = "SELECT EXISTS( SELECT 1 FROM pereval_added WHERE id = %s)"
+
+SQL_IS_USER_EMAIL_EXISTS = "SELECT EXISTS( SELECT 1 FROM users WHERE email = %s)"
+
+SQL_SELECT_USER_EMAIL_BY_PEREVAL_ID = '''SELECT email 
+                                    FROM users 
+                                    JOIN pereval_added ON pereval_added.id = %s
+                                    WHERE users.id = pereval_added.user_id
+                                '''
