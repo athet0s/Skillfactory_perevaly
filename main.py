@@ -4,7 +4,7 @@ from fastapi.responses import JSONResponse
 from fastapi.encoders import jsonable_encoder
 
 from schemas import Pereval
-from classes import PerevalManager
+from classes import PerevalManager, PerevalUpdateExeption
 
 app = FastAPI()
 
@@ -66,10 +66,20 @@ def get_user_perevals(user_email: str):
 @app.patch("/submitData/{pereval_id}")
 def change_pereval(pereval_id: int, data: Pereval):
     pereval_manager = PerevalManager()
-    with pereval_manager as db:
-        is_successful = db.update_data(pereval_id, data)
+    try:
+        with pereval_manager as db:
+            db.update_data(pereval_id, data)
+    except PerevalUpdateExeption as er:
+        error_messages = ["Перевал с указанным id не найден",
+                          "Пользователь с указанным email не найден",
+                          "Пользователь с указанным email не является авторм записи о перевале с указанным id"]
+        return JSONResponse(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            content=jsonable_encoder({'state': 0, 'message': error_messages[er.error_code]})
+        )
+
     return JSONResponse(
         status_code=status.HTTP_200_OK,
-        content=jsonable_encoder({'state': is_successful, 'message': 'placeholder'})
+        content=jsonable_encoder({'state': 'is_successful', 'message': 'placeholder'})
     )
 

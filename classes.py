@@ -106,7 +106,7 @@ class PerevalManager(DBManager):
         return [dict(pereval) for pereval in perevals]
 
     def update_data(self, pereval_id, data):
-        self.is_pereval_poster_email_matches_user_email(9, '')
+        self.validate_pereval_update_id_and_email(pereval_id, data.user.email)
         self._update_pereval(pereval_id, data)
         self._update_coords(pereval_id, data)
         self._conn.commit()
@@ -123,6 +123,7 @@ class PerevalManager(DBManager):
                                                    'level_summer': level.summer,
                                                    'level_autumn': level.autumn,
                                                    'level_spring': level.spring}))
+        print(self._cursor.rowcount)
 
     def _update_coords(self, pereval_id, data):
         coords = data.coords
@@ -142,4 +143,19 @@ class PerevalManager(DBManager):
     def is_pereval_poster_email_matches_user_email(self, pereval_id, email):
         self._cursor.execute(SQL_SELECT_USER_EMAIL_BY_PEREVAL_ID, (pereval_id,))
         return self._cursor.fetchone()[0] == email
+
+    def validate_pereval_update_id_and_email(self, pereval_id, email):
+        if not self.is_pereval_exists(pereval_id):
+            raise PerevalUpdateExeption(0)
+        if not self.is_email_exists(email):
+            raise PerevalUpdateExeption(1)
+        if not self.is_pereval_poster_email_matches_user_email(pereval_id, email):
+            raise PerevalUpdateExeption(2)
+        return True
+
+
+class PerevalUpdateExeption(Exception):
+
+    def __init__(self, error_code):
+        self.error_code = error_code
 
