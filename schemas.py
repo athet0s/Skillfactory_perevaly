@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Union
 from pydantic import BaseModel, Field
 
 
@@ -40,4 +40,41 @@ class Pereval(BaseModel):
     level: Level
 
 
+class PerevalStatusResponse(BaseModel):
+    status: int = 200
+    message: str
+    id: Union[int, None] = None
 
+
+class PerevalResponse(BaseModel):
+    id: int
+    date_added: str
+    status: str
+    beauty_title: str
+    title: str
+    other_titles: str
+    connect: str
+    add_time: str
+    level_winter: str
+    level_summer: str
+    level_autumn: str
+    level_spring: str
+    latitude: float
+    longitude: float
+    height: int
+
+
+class PerevalInfo(BaseModel):
+    id: int
+    title: str
+    beauty_title: str
+    status: str
+    date_added: str
+    latitude: float
+    longitude: float
+    height: float
+
+
+class PerevalStateResponse(BaseModel):
+    state: int
+    message: str

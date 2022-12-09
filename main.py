@@ -2,8 +2,9 @@ from fastapi import FastAPI, status
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from fastapi.encoders import jsonable_encoder
+from typing import List
 
-from schemas import Pereval
+from schemas import Pereval, PerevalStatusResponse, PerevalResponse, PerevalInfo, PerevalStateResponse
 from classes import PerevalManager, PerevalUpdateExeption
 
 app = FastAPI()
@@ -17,7 +18,7 @@ def validation_exception_handler(request, exc):
     )
 
 
-@app.post("/submit")
+@app.post("/submit", response_model=PerevalStatusResponse)
 def submitData(data: Pereval):
     try:
         pereval_manager = PerevalManager()
@@ -31,7 +32,7 @@ def submitData(data: Pereval):
     return {"status": 200, "message": "Отправлено успешно", "id": added_pereval_id}
 
 
-@app.get("/submitData/{pereval_id}")
+@app.get("/submitData/{pereval_id}", response_model=PerevalResponse, responses={404: {"model": PerevalStatusResponse}})
 def get_pereval(pereval_id: int):
     pereval_manager = PerevalManager()
     with pereval_manager as db:
@@ -47,7 +48,7 @@ def get_pereval(pereval_id: int):
     )
 
 
-@app.get("/submitData")
+@app.get("/submitData", response_model=List[PerevalInfo], responses={404: {"model": PerevalStatusResponse}})
 def get_user_perevals(user_email: str):
     pereval_manager = PerevalManager()
     with pereval_manager as db:
@@ -63,7 +64,7 @@ def get_user_perevals(user_email: str):
     )
 
 
-@app.patch("/submitData/{pereval_id}")
+@app.patch("/submitData/{pereval_id}", response_model=PerevalStateResponse)
 def change_pereval(pereval_id: int, data: Pereval):
     pereval_manager = PerevalManager()
     try:
