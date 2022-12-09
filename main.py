@@ -80,6 +80,6 @@ def change_pereval(pereval_id: int, data: Pereval):
 
     return JSONResponse(
         status_code=status.HTTP_200_OK,
-        content=jsonable_encoder({'state': 'is_successful', 'message': 'placeholder'})
+        content=jsonable_encoder({'state': 1, 'message': 'обновление прошло успешно'})
     )
 

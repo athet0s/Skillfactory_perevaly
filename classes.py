@@ -3,6 +3,7 @@ import psycopg2
 from psycopg2 import extras
 from dotenv import load_dotenv
 from datetime import datetime
+from schemas import Pereval
 from sql import *
 
 load_dotenv()
@@ -32,7 +33,7 @@ class DBManager:
 
 class PerevalManager(DBManager):
 
-    def insert_data(self, data):
+    def insert_data(self, data: Pereval):
         user_id = self._insert_or_update_user(data)
         coord_id = self._insert_coords(data)
         pereval_id = self._insert_pereval(data, user_id, coord_id)
@@ -40,7 +41,7 @@ class PerevalManager(DBManager):
         self._conn.commit()
         return pereval_id
 
-    def _insert_or_update_user(self, data):
+    def _insert_or_update_user(self, data: Pereval):
         user = data.user
         self._cursor.execute(SQL_INSERT_OR_UPDATE_USERS,
                              ({'fam': user.fam,
@@ -51,7 +52,7 @@ class PerevalManager(DBManager):
         pk = self._cursor.fetchone()[0]
         return pk
 
-    def _insert_coords(self, data):
+    def _insert_coords(self, data: Pereval):
         coords = data.coords
         self._cursor.execute(SQL_INSERT_COORDS,
                              ({'latitude': float(coords.latitude),
@@ -60,7 +61,7 @@ class PerevalManager(DBManager):
         pk = self._cursor.fetchone()[0]
         return pk
 
-    def _insert_pereval(self, data, user_id, coord_id):
+    def _insert_pereval(self, data: Pereval, user_id: int, coord_id: int):
         level = data.level
         self._cursor.execute(SQL_INSERT_PEREVAL,
                              ({'beauty_title': data.beauty_title,
@@ -80,7 +81,7 @@ class PerevalManager(DBManager):
         pk = self._cursor.fetchone()[0]
         return pk
 
-    def _insert_images(self, data, pereval_id):
+    def _insert_images(self, data, pereval_id: int):
         for i in data.images:
             self._cursor.execute(SQL_INSERT_PEREVAL_IMAGES,
                                  ({'title': i.title,
@@ -91,28 +92,28 @@ class PerevalManager(DBManager):
                                  ({'pereval_id': pereval_id,
                                    'image_id': image_id}))
 
-    def get_pereval_data_by_id(self, pereval_id):
+    def get_pereval_data_by_id(self, pereval_id: int):
         self._cursor.execute(SQL_SELECT_PEREVAL_BY_ID, (pereval_id,))
         pereval = self._cursor.fetchone()
         if not pereval:
             return False
         return dict(pereval)
 
-    def get_perevals_by_user_email(self, user_email):
+    def get_perevals_by_user_email(self, user_email: str):
         self._cursor.execute(SQL_SELECT_PEREVALS_BY_USER_EMAIL, (user_email,))
         perevals = self._cursor.fetchall()
         if len(perevals) == 0:
             return False
         return [dict(pereval) for pereval in perevals]
 
-    def update_data(self, pereval_id, data):
+    def update_data(self, pereval_id: int, data: Pereval):
         self.validate_pereval_update_id_and_email(pereval_id, data.user.email)
         self._update_pereval(pereval_id, data)
         self._update_coords(pereval_id, data)
         self._conn.commit()
         return True
 
-    def _update_pereval(self, pereval_id, data):
+    def _update_pereval(self, pereval_id: int, data: Pereval):
         level = data.level
         self._cursor.execute(SQL_UPDATE_PEREVAL, ({'id': pereval_id,
                                                    'beauty_title': data.beauty_title,
@@ -125,26 +126,26 @@ class PerevalManager(DBManager):
                                                    'level_spring': level.spring}))
         print(self._cursor.rowcount)
 
-    def _update_coords(self, pereval_id, data):
+    def _update_coords(self, pereval_id: int, data: Pereval):
         coords = data.coords
         self._cursor.execute(SQL_UPDATE_COORDS, ({'latitude': float(coords.latitude),
                                                   'longitude': float(coords.longitude),
                                                   'height': int(coords.height),
                                                   'pereval_id': pereval_id}))
 
-    def is_pereval_exists(self, pereval_id):
+    def is_pereval_exists(self, pereval_id: int):
         self._cursor.execute(SQL_IS_PERVAL_ID_EXISTS, (pereval_id,))
         return self._cursor.fetchone()[0]
 
-    def is_email_exists(self, email):
+    def is_email_exists(self, email: str):
         self._cursor.execute(SQL_IS_USER_EMAIL_EXISTS, (email,))
         return self._cursor.fetchone()[0]
 
-    def is_pereval_poster_email_matches_user_email(self, pereval_id, email):
+    def is_pereval_poster_email_matches_user_email(self, pereval_id: int, email: str):
         self._cursor.execute(SQL_SELECT_USER_EMAIL_BY_PEREVAL_ID, (pereval_id,))
         return self._cursor.fetchone()[0] == email
 
-    def validate_pereval_update_id_and_email(self, pereval_id, email):
+    def validate_pereval_update_id_and_email(self, pereval_id: int, email: str):
         if not self.is_pereval_exists(pereval_id):
             raise PerevalUpdateExeption(0)
         if not self.is_email_exists(email):
